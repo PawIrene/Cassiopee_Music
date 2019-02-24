@@ -21,7 +21,7 @@ def note(fNote, fech=44100, duree=3, volume=0.5, nbOctet=2):
     assert (type(fech) == int and fech > 0),"la frequence d echantillonage\
     doit etre un entier positif"
     assert (fNote >= 0),"la frequence de la note doit etre un float positif"
-    assert (duree > 0),"la duree de la note\
+    assert (duree >= 0),"la duree de la note\
     doit etre un nombre flotant positif de secondes"
     assert (type(nbOctet)==int and (nbOctet==1 or nbOctet==2)),\
 "le nombre d'octet par echantillon doit valoir 1 ou 2"
