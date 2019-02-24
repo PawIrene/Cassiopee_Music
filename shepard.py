@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Feb 24 01:39:57 2019
-
-@author: Popes
+Ce module permet de realiser des tableaux d'entier directement exploitable par le module wav.py pour manipuler les sons de Shepard.
 """
 import wav as w
 import math as m
