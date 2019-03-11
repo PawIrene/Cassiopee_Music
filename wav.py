@@ -2,36 +2,68 @@
 
 """Ce module permet de manipuler des fichiers au format .wav """
 
+import wave
+
 def read_wave(nom):
     """
-    Lit un fichier .wav et affiche son contenu (format byte elements)
+    Lit un fichier .wav et renvoie le tableau d'entier correspondant
+    aux valeurs des échantillons.
+    Le premier element du tableau est un tuple contenant tout les parametres
+    du fichier sonore sous la forme :
+    (nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" )
     
-    nom : string du nom du fichier, sans l extension .wav a la fin
+    - nom : string du nom du fichier, sans l extension .wav a la fin
     
     """
-    assert (type(nom)== str),"nom doit etre une chaine de charactere"
-    
-    with open(nom + ".wav", "rb") as fichier:
-        print(fichier.read())
+    with wave.open(nom + ".wav",'r') as fichier: #creation de l'objet type Wave_read
+     #on recupere les donnees brut au format byte_elt (pas l'en-tete) :
+        data_byte=fichier.readframes(fichier.getnframes())
+        data_length = len(data_byte) #nb d'octets de donnees
+        nbOctet = fichier.getsampwidth() #echantillon code sur 1 ou 2 octets
+        if(nbOctet == 1): #la conversion pour 1 octet est directe
+            resultat = [data_byte[i] for i in range(data_length)]
+        else: #on regle la conversion dans le cas de deux octet + signe :
+            i=0
+            resultat = []
+            while i < data_length:
+                valeur_ech = int.from_bytes(data_byte[i:i+2], byteorder='little', signed=True)
+                resultat.append(valeur_ech)
+                i=i+2
+        params = [fichier.getparams()]
+    return params + resultat #on ajoute directement les info des parametre dans la liste
 
-
-def new_wave(nom, data=[], fech=44100, nbOctet=2):
+def new_param(nframes,nbOctet=2,fech=44100,nchannel=1):
     """
-    Cree un fichier .wav
+    Renvoie le tuple a mettre au debut des tableaux data permettant de
+    parametrer le fichier sonor.
     
-    nom : string du nom du fichier, sans l extension .wav à la fin
-    fech : fréquence d'échantillonage en Hz
-    nbOctet : nombre d'octet pour coder la valeur d un echantillon
-    data : tableau contenant la valeur des octets en decimale (de 0 à 255)
+    tout les parametres attendus son des entiers :
+    - nframes : le nombre total d'echantillon du fichier
+    - nbOctet : 1 ou 2 octets pour quantifier un echantillon
+    - fech : la frequence d echantillonnage
+    - nchannel : 1 ou 2 si mono ou stereo
+    """
+    
+    return (nchannel, nbOctet, fech, nframes,"NONE","not compressed")
+    
+
+def new_wave(nom, data=[]):
+    """
+    Cree le fichier wav correspondant a data.
+    
+    - nom : string du nom du fichier, sans l extension .wav a la fin
+    
+    - data : tableau d'entier correspondant aux valeurs des échantillons.
+    Le premier element du tableau est un tuple contenant tout les parametres
+    du fichier sonore sous la forme :
+    (nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" )
     
     """
     
     assert (type(nom) == str),"nom doit etre une chaine de charactere"
-    assert (type(fech) == int and fech > 0),"la frequence d echantillonage\
-    doit etre un entier positif"
-    assert (type(nbOctet)==int and (nbOctet==1 or nbOctet==2)),\
-"le nombre d'octet par echantillon doit valoir 1 ou 2"
-    assert (type(data)==list),"data doit être une liste"
+    assert (type(data)==list and (type(data[0])==wave._wave_params or type(data[0])==tuple)),\
+    "data doit être une liste au bon format"
+    
     try: #on ne créé le fichier que si il n'existe pas encore
         fichier = open(nom + ".wav", "x")
         fichier.close
@@ -39,71 +71,18 @@ def new_wave(nom, data=[], fech=44100, nbOctet=2):
         print("le fichier ",nom,".wav existe déjà")
         return 1 #on ne cree pas le fichier
     
-    with open(nom + ".wav", "wb") as fichier:
-        duree = len(data)/(fech)
-        
-        "Creation de l'en-tete :______________________________________________"
-        
-        fichier.write("\x52\x49\x46\x46".encode()) #Charactere 'RIFF' identifie format
-        #longueur octet donnees format wave restantes sur 4 octets
-        fichier.write(conv_entete(len(data)*nbOctet+48,4));
-        fichier.write("\x57\x41\x56\x45\x66\x6D\x74\x20".encode()) #'WAVEfmt '
-        #16 octets utilises pour defenir le format:
-        fichier.write(conv_entete(16,4));
-        #format de compression 1 => sans compression
-        fichier.write(conv_entete(1,2));
-        #nombre de canaux 1 => mono
-        fichier.write(conv_entete(1,2));
-        #frequence echantillonage
-        fichier.write(conv_entete(fech,4));
-        #debit octet/s
-        fichier.write(conv_entete(fech*nbOctet,4));
-        #produit nombre canaux par nombre octet par echantillon (le 1 car mono)
-        fichier.write(conv_entete(1*nbOctet,2));
-        #nb bit/echantillon
-        fichier.write(conv_entete(8*nbOctet,2));
-        fichier.write("\x66\x61\x63\x74\x04\x00\x00\x00".encode()) #'fact'puis 4
-        #nombre d'echantillons
-        fichier.write(conv_entete(len(data)*nbOctet,4));
-        fichier.write("\x64\x61\x74\x61".encode()) #'data'
-        #nombre d'echantillons
-        fichier.write(conv_entete(len(data)*nbOctet,4));
-        
-        "on ecrit la suite de donnees au bon format :_________________________"
-        isSigned = (nbOctet==2)
-        for i in range(len(data)):
-            octetByte =  (data[i]).to_bytes(nbOctet,'little',signed=isSigned)
-            if(i==0):
-                donnees = octetByte
-            else :
-                donnees += octetByte
-        fichier.write(donnees)
     
-    "on donne les infos sur le fichier :_____________________________________"
-    print("creation du fichier {0}.wav de duree {1}s".format(nom,duree))
-
-def conv_entete(valeur, nbOctet):
-    """
-    renvoit le byte element correspondant a la valeur pour remplir l'entete wav
-    
-    exemple : valeur = 65584 = 00010030h et nbOctet = 4 en entree, 
-            renvoie : b'\x30\x00\x01\x00'
-    
-    """
-    
-    resHex = [0]*(nbOctet*2) #resultat intermediaire a convertir en byte elm
-    resInt = [0]*nbOctet #on les replace dans l'ordre et en decimal ici
-    for i in range(nbOctet*2-1,-1,-1):
-        resHex[i] = valeur//(16**i)
-        valeur = valeur%(16**i)
-    for i in range(nbOctet):
-        resInt[i] = 16*resHex[2*i+1]+resHex[2*i]
-    #il ne reste plus qu'a convertir en byte element
-    for i in range(nbOctet):
-        ech = resInt[i].to_bytes(1,'big')
-        if(i==0):
-            byteElt = ech
-        else :
-            byteElt += ech
-    return byteElt
+    with wave.open(nom + ".wav",'w') as fichier: #creation de l'objet type Wave_write
+        fichier.setparams(data[0])
+        print("creation du fichier en cours...")
+        if(data[0][1] == 1):
+            encodage='B'
+        else:
+            encodage='h'
+        for i in range(1,len(data)):
+            fichier.writeframes(wave.struct.pack(encodage,data[i]))
+            
+    #la duree est egale au nombre d'échantillon divise par fech.
+    duree = data[0][3]/(data[0][2])
+    print("le fichier {0}.wav de duree {1}s a ete cree".format(nom,round(duree,2)))
     
