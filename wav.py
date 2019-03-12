@@ -8,9 +8,9 @@ def read_wave(nom):
     """
     Lit un fichier .wav et renvoie le tableau d'entier correspondant
     aux valeurs des échantillons.
-    Le premier element du tableau est un tuple contenant tout les parametres
+    Le premier element du tableau est une liste contenant tout les parametres
     du fichier sonore sous la forme :
-    (nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" )
+    [nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" ]
     
     - nom : string du nom du fichier, sans l extension .wav a la fin
     
@@ -29,8 +29,9 @@ def read_wave(nom):
                 valeur_ech = int.from_bytes(data_byte[i:i+2], byteorder='little', signed=True)
                 resultat.append(valeur_ech)
                 i=i+2
-        params = [fichier.getparams()]
-    return params + resultat #on ajoute directement les info des parametre dans la liste
+        params = fichier.getparams()
+        entete = [params[a] for a in range(6)]
+    return entete + resultat #on ajoute directement les info des parametre dans la liste
 
 def new_param(nframes,nbOctet=2,fech=44100,nchannel=1):
     """
@@ -44,7 +45,7 @@ def new_param(nframes,nbOctet=2,fech=44100,nchannel=1):
     - nchannel : 1 ou 2 si mono ou stereo
     """
     
-    return (nchannel, nbOctet, fech, nframes,"NONE","not compressed")
+    return [nchannel, nbOctet, fech, nframes,"NONE","not compressed"]
     
 
 def new_wave(nom, data=[]):
@@ -54,14 +55,14 @@ def new_wave(nom, data=[]):
     - nom : string du nom du fichier, sans l extension .wav a la fin
     
     - data : tableau d'entier correspondant aux valeurs des échantillons.
-    Le premier element du tableau est un tuple contenant tout les parametres
+    Le premier element du tableau est une liste contenant tout les parametres
     du fichier sonore sous la forme :
-    (nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" )
+    [nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" ]
     
     """
     
     assert (type(nom) == str),"nom doit etre une chaine de charactere"
-    assert (type(data)==list and (type(data[0])==wave._wave_params or type(data[0])==tuple)),\
+    assert (type(data)==list and type(data[0])==list),\
     "data doit être une liste au bon format"
     
     try: #on ne créé le fichier que si il n'existe pas encore
@@ -85,4 +86,5 @@ def new_wave(nom, data=[]):
     #la duree est egale au nombre d'échantillon divise par fech.
     duree = data[0][3]/(data[0][2])
     print("le fichier {0}.wav de duree {1}s a ete cree".format(nom,round(duree,2)))
-    
+
+
