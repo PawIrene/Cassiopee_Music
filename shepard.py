@@ -12,9 +12,9 @@ def note(fNote, fech=44100, duree=3, volume=0.5, nbOctet=2):
     de frequence fNote echantillonee a fech en Hz quantifie sur nbOctet sur une
     duree de duree s.
     
-    Le premier element du tableau est un tuple contenant tout les parametres
+    Le premier element du tableau est une liste contenant tout les parametres
     du fichier sonore sous la forme :
-    (nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" )
+    [nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" ]
     
     - fNote float positif en Hz
     - fech entiers positifs en Hz
@@ -52,9 +52,9 @@ def noteShepard(fFond, duree=1, volume=0.5, nbOctet=2, fech = 44100):
     de frequence fondamentale fNote en HZ echantillonee a fech quantifie sur 
     nbOctet sur une duree de duree s.
     
-    Le premier element du tableau est un tuple contenant tout les parametres
+    Le premier element du tableau est une liste contenant tout les parametres
     du fichier sonore sous la forme :
-    (nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" )
+    [nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" ]
     
     - fFond et fech en Hz des entiers positifs
     - duree en s positive
@@ -75,7 +75,6 @@ def noteShepard(fFond, duree=1, volume=0.5, nbOctet=2, fech = 44100):
     params = [w.new_param(len(data),nbOctet,fech)]
     return params + data
 
-
    
 
 def gammeShepard(nbRepet=1,dureeNote=0.35,dureeSilence=0.15,volume=0.5,nbOctet=2\
@@ -86,9 +85,9 @@ def gammeShepard(nbRepet=1,dureeNote=0.35,dureeSilence=0.15,volume=0.5,nbOctet=2
     avec des duree de note de dureeNote secondes et des silences de
     dureeSilence secondes.
     
-    Le premier element du tableau est un tuple contenant tout les parametres
+    Le premier element du tableau est une liste contenant tout les parametres
     du fichier sonore sous la forme :
-    (nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" )
+    [nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" ]
     
     - nbRepet entier positif
     - duree en s positive
