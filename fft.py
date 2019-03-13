@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-module permettant d'afficher la FFT d'un tableau d'echantillon et de fournir d'autres fonctions comme le retournement de spectre
-et le decalage de spectre d'un tableau d'echantillon
+module permettant d'afficher la FFT d'un tableau d'echantillons et de fournir
+d'autres fonctions comme le retournement de spectre et le decalage de spectre
+d'un tableau d'echantillon
 """
 
 import numpy as np
@@ -15,9 +16,9 @@ def graphe_fft(data,tmin=0,tmax=0.02,fmin=0,fmax=22100):
     - tmin et tmax en s
     - fmin et fmax en Hz
     - data un tableau d'entier correspondant aux valeurs des échantillons.
-    Le premier element du tableau est une liste contenant tout les parametres
+    Le premier element du tableau est un tuple contenant tout les parametres
     du fichier sonore sous la forme :
-    [nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" ]
+    (nchannels, sampwidth, framerate, nframes, "NONE", "not compressed" )
     """
     fech = data[0][2]
     Te = 1/fech
