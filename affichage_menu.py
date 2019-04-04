@@ -7,7 +7,7 @@ from tkinter import messagebox
 
 def affiche_note():
 
-    note = tk.PhotoImage(file="note_taille.png")
+    note = tk.PhotoImage(file="Src/note_taille.png")
     canvas.pack(expand=YES, fill=BOTH)
     def _create_circle(self, x, y, r, **kwargs):
         return self.create_oval(x-r, y-r, x+r, y+r, **kwargs)
@@ -20,7 +20,7 @@ def affiche_note():
     """
 
 def affiche_portee():
-    cle_de_sol = tk.PhotoImage(file="cle_de_sol.png")    
+    cle_de_sol = tk.PhotoImage(file="Src/cle_de_sol.png")    
     canvas.pack(expand=YES, fill =BOTH)
     for i in range(6):
         canvas.create_line(0,50*i,400,50*i)
