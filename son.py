@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Ce module permet de définir les objets donnees_son.
+Ce module permet de definir les objets donnees_son.
 """
 
 import wave
@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 
 def ouvrir(nom):
     """
-    Si nom est une chaîne de caractère correspondant à un ficher wave 
-    (sans l'extension), renvoie l’objet donnees_son correspondant à ce fichier sonore.
+    Si nom est une chaine de caractere correspondant a un ficher wave 
+    (sans l'extension), renvoie l’objet donnees_son correspondant a ce fichier sonore.
     """
     with wave.open(nom + ".wav",'r') as fichier: #creation de l'objet type Wave_read
      #on recupere les donnees brut au format byte_elt (pas l'en-tete) :
@@ -38,7 +38,7 @@ class DonneeSon:
     """
     objet DonneeSon
         -data le tableau des valeurs des echantillons
-        -nbOctet = 1 ou 2 le nombre d'octets utilisé par échantillon
+        -nbOctet = 1 ou 2 le nombre d'octets utilise par echantillon
         -fech la frequence d'echantillonnage
     """
     def __init__(self,data,nbOctet,fech):
@@ -48,8 +48,8 @@ class DonneeSon:
     
     def ecrire(self,nom):
         """
-        Créé, sous le nom nom, le fichier au format wave 
-        correspondant à l’objet.
+        Cree, sous le nom nom, le fichier au format wave 
+        correspondant a l’objet.
         """
         assert (type(nom) == str),"nom doit etre une chaine de charactere"
         assert (not(os.path.exists(nom+".wav"))), "le fichier " +nom +".wav existe déjà"
@@ -72,10 +72,10 @@ class DonneeSon:
     
     def ssEch(self,N=2):
         """
-        Si le nombre d’échantillons de l’objet est bien multiple de N, modifie 
-        l’objet de manière à obtenir sa version sous-échantillonnée à fech/N.
+        Si le nombre d’echantillons de l’objet est bien multiple de N, modifie 
+        l’objet de maniere a obtenir sa version sous-echantillonnee a fech/N.
         """
-        assert (type(N)==int),"N doit être un entier"
+        assert (type(N)==int),"N doit etre un entier"
         assert (self.fech%N==0),"la frequence d'echantillonage n'est pas divisible par N"
         self.fech=(self.fech//N)
         newdata = []
@@ -88,10 +88,10 @@ class DonneeSon:
     def formeGraphTemps(self):
         """
         Renvoie un tableau de 2 tableaux [t,y]. 
-        - Le premier élément du tableau est le tableau x représentant la valeur
+        - Le premier element du tableau est le tableau x representant la valeur
         du temps en s. 
-        - Le second élément est le tableau y représentant les valeurs des 
-        échantillons correspondantes.
+        - Le second element est le tableau y representant les valeurs des 
+        echantillons correspondantes.
         """
         
         Te = 1/self.fech
@@ -105,10 +105,10 @@ class DonneeSon:
     def formGraphFFT(self,fmin=0,fmax=22100):
         """
         Renvoie un tableau de 2 tableaux [f,Y]. 
-        - Le premier élément du tableau est le tableau f représentant la valeur
-        des fréquences en Hz.
-        Le second élément est le tableau Y représentant le module des valeurs des 
-        échantillons correspondantes dans le domaine de Fourier une fois normalisé.
+        - Le premier element du tableau est le tableau f representant la valeur
+        des frequences en Hz.
+        Le second element est le tableau Y representant le module des valeurs des 
+        echantillons correspondantes dans le domaine de Fourier une fois normalise.
         """
         # definition de y, les donnees au format array
         y = np.asarray(self.data)
@@ -156,8 +156,8 @@ class DonneeSon:
         
     def inverseFFT(self):
         """
-        Modifie l’objet de manière à réaliser l’opération d’inversion du spectre 
-        (on inverse le signe des échantillons une fois sur deux)
+        Modifie l’objet de maniere a realiser l’operation d’inversion du spectre 
+        (on inverse le signe des echantillons une fois sur deux)
         """
         if(self.nbOctet==2): #code sur 2 octet, donc signed
             inverse = [(-1)**((n-1)%2)*(self.data[n]) for n in range(1,len(self.data))]
@@ -172,12 +172,12 @@ class DonneeSon:
         
     def decalFFT(self,f,plage=[70,350]):
         """
-        Modifie l’objet de manière à obtenir les échantillons correspondant à 
-        un décalage de la plage de fréquence plage de f herz (f peut être négatif).
+        Modifie l’objet de maniere a obtenir les echantillons correspondant à 
+        un decalage de la plage de frequence plage de f herz (f peut etre negatif).
         """
-        assert((f+plage[0])>0),"la borne inférieur de la plage est trop basse"
-        assert((f+plage[1])<(len(self.data)//2)),"la borne supérieure de la plage est trop haute"
-        assert(f!=0),"entrer une fréquence non nulle"
+        assert((f+plage[0])>0),"la borne inferieur de la plage est trop basse"
+        assert((f+plage[1])<(len(self.data)//2)),"la borne superieure de la plage est trop haute"
+        assert(f!=0),"entrer une frequence non nulle"
         
         duree = len(self.data)/(self.fech)
         idecal = int(f*duree) #correspond au nombre d'indice du decallage
@@ -202,10 +202,3 @@ class DonneeSon:
 #les approximations du calcul font apparaitre des parties imaginaires très faibles
         a=np.real(np.fft.ifft(A))
         self.data = [int(a[i]) for i in range(len(a))]
-            
-        
-        
-        
-        
-        
-        
