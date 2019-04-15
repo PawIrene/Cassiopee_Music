@@ -4,6 +4,7 @@ Ce module permet de générer des objets donnees_son representant des sons de Sh
 """
 
 import son
+import numpy as np
 
 def note(fNote,nbOctet=2,fech=44100,duree=3,volume=0.5):
     """
