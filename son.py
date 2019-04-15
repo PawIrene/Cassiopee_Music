@@ -126,6 +126,8 @@ class DonneeSon:
         """
         Permet de visualiser le module de la transformee de fourier en regard de
         la forme d'onde.
+        Il reste a effectuer un matplotlib.pyplot.show() apres avoir ajoute
+        toutes les courbes voulues.
         
         - tmin et tmax en s
         - fmin et fmax en Hz
