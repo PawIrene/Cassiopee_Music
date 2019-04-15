@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Ce module permet de générer des objets donnees_son représentant des sons de Shepard.
+Ce module permet de générer des objets donnees_son representant des sons de Shepard.
 """
 
 import son
 
 def note(fNote,nbOctet=2,fech=44100,duree=3,volume=0.5):
     """
-    Renvoie l’objet donnees_son correspondant à une sinusoïde pure de fréquence
-    fNote avec les paramètres de pas de quantification, de fréquence 
-    d’échantillonnage, de durée et de volume entré.
+    Renvoie l’objet donnees_son correspondant a une sinusoide pure de frequence
+    fNote avec les parametres de pas de quantification, de frequence 
+    d’echantillonnage, de duree et de volume entre.
     
     - fNote float positif en Hz
     - nbOctet un entier entre 1 et 2
@@ -42,7 +42,7 @@ def note(fNote,nbOctet=2,fech=44100,duree=3,volume=0.5):
     
 def noteShepard(fFond, nbOctet = 2, duree = 3, volume = 0.5):
     """
-    Renvoie l’objet donnees_son correspondant à une note de Shepard de 
+    Renvoie l’objet donnees_son correspondant a une note de Shepard de 
     fondamentale fFond en Hertz.
     
     - fFond en Hz des entiers positifs
@@ -71,7 +71,7 @@ def gammeShepard(listFond=[16.35*2**(float(i)/12) for i in range(12)],\
 nbOctet=2,fech=44100,dureeNote=0.35,dureeSilence=0.15,volume=0.5):
     
     """
-    Renvoie l’objet donnees_son correspondant à un enchainement de notes de 
+    Renvoie l’objet donnees_son correspondant a un enchainement de notes de 
     Shepard. Permet de tester l’illusion auditive.
     
     - duree en s positive
