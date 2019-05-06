@@ -87,6 +87,24 @@ def open_son():
 
    
 root = tk.Tk()
+
+ecran_accueil = Canvas(root, width=500, height=500)
+#ecran_accueil.create_image(250, 250, image = 'Bienvenue.png')
+
+photo = PhotoImage(file='Bienvenue.png')
+item = ecran_accueil.create_image(250,250, image=photo)
+ecran_accueil.pack()
+
+#TEXTE = "Bienvenue sur l'application d'étude de signaux musicaux et acoustiques."
+TEXTE2 = "Pour créer un fichier .wav, veuillez cliquer sur File puis New."
+TEXTE3 = "Pour ouvrir un fichier .wav déjà existant, veuillez cliquer sur File puis Open."
+
+#label = tk.Label(root, text = TEXTE, wraplength = 500, justify = tk.CENTER)
+#label.pack()
+label2 = tk.Label(root, text = TEXTE2, wraplength = 500, justify = tk.CENTER)
+label2.pack()
+label3 = tk.Label(root, text = TEXTE3, wraplength = 500, justify = tk.CENTER)
+label3.pack()
 menubar= Menu(root)
 
 filemenu = Menu(menubar, tearoff = 0)
