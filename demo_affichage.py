@@ -75,9 +75,9 @@ def open_son():
    
 root = tk.Tk()
 
-ecran_accueil = Canvas(root, width=500, height=500)
+ecran_accueil = Canvas(root, width=500, height=500, bg = "white")
 
-photo = PhotoImage(file='Bienvenue.png')
+photo = PhotoImage(file='Bienvenue2.png')
 item = ecran_accueil.create_image(250,250, image=photo)
 ecran_accueil.pack()
 
