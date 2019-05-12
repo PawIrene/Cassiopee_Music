@@ -25,13 +25,36 @@ def inversion_spectre():
    plt.show()
    donnee.ecrire("cassiopeReverse")
 
+def grapheFFT(e1):
+   donnee = shepard.note(int(e1))
+   donnee.graphFFT()
+   plt.show()
+
+def decalFFT(e1):
+   donnee = shepard.note(int(e1))
+   donnee.decalFFT(-19000, [19100,22050])
+   donnee.graphFFT()
+   plt.show()
+   
+def add_some_action(e1):
+   filewin = Toplevel(root)
+   TEXTE = "Vous venez de créer un fichier son. Si vous souhaitez visualiser le module de la transformée de fourier, cliquez sur le boutton ci-dessous:"
+   Label(filewin, text = TEXTE).grid(row=0)
+   Button(filewin, text='Afficher le graphe FFT', command= lambda : grapheFFT(e1)).grid(row=1, column=1, sticky=W, pady=4)
+   TEXTE2 = "Si vous souhaitez décaler la plage de fréquence, veuillez cliquer sur le boutton ci dessous."
+   Label(filewin, text = TEXTE2).grid(row=2)
+   Button(filewin, text='Inverser le graphe FFT', command= lambda : decalFFT(e1)).grid(row=3, column=1, sticky=W, pady=4)
+   Button(filewin, text='Quit', command=filewin.quit).grid(row=3, column=0, sticky=W, pady=4)  
+
 def create_son(e1):
    donnee = shepard.note(int(e1))   
    print("Création de la note de fréquence fondamentale", int(e1))
+   add_some_action(e1)
 
 def create_son_shepard(e1):
    donnee = shepard.noteShepard(int(e1))
    print("Creation de la note de Shepard de fréquence fondamentale", int(e1))
+   add_some_action(e1)
 
 def create_note_shepard():
    filewin = Toplevel(root)
