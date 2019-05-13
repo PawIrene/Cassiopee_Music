@@ -8,23 +8,6 @@ import son
 import shepard
 import matplotlib.pyplot as plt
 
-def create_shepard():
-   donnee = shepard.noteShepard(13)
-   donnee.graphFFT(fmax = 7500)
-   plt.show()
-   donnee.ecrire("noteShepard")
-
-def inversion_spectre():
-   donnee = son.ouvrir("la")
-   donnee.graphFFT()
-   donnee.inverseFFT()
-   donnee.graphFFT()
-   plt.show()
-   donnee.decalFFT(-19000, [19100,22050])
-   donnee.graphFFT()
-   plt.show()
-   donnee.ecrire("cassiopeReverse")
-
 def grapheFFT(e1):
    donnee = shepard.note(int(e1))
    donnee.graphFFT()
@@ -35,6 +18,10 @@ def decalFFT(e1):
    donnee.decalFFT(-19000, [19100,22050])
    donnee.graphFFT()
    plt.show()
+
+def ecrire_wav(e1, e2):
+   donnee = shepard.note(int(e1))
+   donnee.ecrire(e2)
    
 def add_some_action(e1):
    filewin = Toplevel(root)
@@ -44,7 +31,16 @@ def add_some_action(e1):
    TEXTE2 = "Si vous souhaitez décaler la plage de fréquence, veuillez cliquer sur le boutton ci dessous."
    Label(filewin, text = TEXTE2).grid(row=2)
    Button(filewin, text='Inverser le graphe FFT', command= lambda : decalFFT(e1)).grid(row=3, column=1, sticky=W, pady=4)
-   Button(filewin, text='Quit', command=filewin.quit).grid(row=3, column=0, sticky=W, pady=4)  
+   TEXTE3 = "Si vous souhaitez créer un fichier au format .wav correspondant à l'objet crée veuillez remplir le champ ci dessous afin de lui donner un nom."
+   Label(filewin, text = TEXTE2).grid(row=4)
+   Label(filewin, text="Nom du fichier .wav : ").grid(row=5)
+   e2 = Entry(filewin)
+   e2.grid(row=5, column=1)
+   try:
+      Button(filewin, text='Créer le fichier .wav', command= lambda : ecrire_wav(e1, e2.get() )).grid(row=6, column=1, sticky=W, pady=4)
+   except AttributeError:
+      pass
+   Button(filewin, text='Quit', command=filewin.quit).grid(row=7, column=0, sticky=W, pady=4)  
 
 def create_son(e1):
    donnee = shepard.note(int(e1))   
@@ -79,14 +75,7 @@ def create_note():
 def open_data(e1):
    var = son.ouvrir(e1)
    print(var.fech)
-   """
-    for element in os.listdir('.'):
-       if element == e1.get():
-          print("Le fichier %s existe \n" % (e1.get()))
-          print("hEllO WOrlD")
-       else:
-          print("**\n")
-   """
+
 def open_son():
    filewin = Toplevel(root)
    Label(filewin, text="Nom du fichier .wav").grid(row=0)
