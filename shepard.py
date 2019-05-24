@@ -10,7 +10,7 @@ def note(fNote,nbOctet=2,fech=44100,duree=3,volume=0.5):
     """
     Renvoie l’objet donnees_son correspondant a une sinusoide pure de frequence
     fNote avec les parametres de pas de quantification, de frequence 
-    d’echantillonnage, de duree et de volume entre.
+    d’echantillonnage, de duree et de volume.
     
     - fNote float positif en Hz
     - nbOctet un entier entre 1 et 2
@@ -86,6 +86,10 @@ nbOctet=2,fech=44100,dureeNote=0.35,dureeSilence=0.15,volume=0.5):
     
     data = []
     silence = [0]*int(fech*dureeSilence)
+    print("Creation de l'objet en cours...")
+    son.raffraichirProgres(0)
     for j in range(len(listFond)):
         data += noteShepard(listFond[j],nbOctet,dureeNote,volume).data + silence
+        son.raffraichirProgres(j/len(listFond))
+    son.raffraichirProgres(1)
     return son.DonneeSon(data,nbOctet,fech)
