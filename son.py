@@ -7,17 +7,23 @@ import wave
 import os.path
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.signal as sig
 import sys
 
 
 def ouvrir(nom):
     """
     Si nom est une chaine de caractere correspondant a un ficher wave 
-    (sans l'extension), renvoie l’objet donnees_son correspondant a ce 
+    (avec ou sans l'extension), renvoie l’objet donnees_son correspondant a ce 
     fichier sonore.
     Gere la conversion stereo vers mono
     """
-    with wave.open(nom + ".wav",'r') as fichier: #creation de l'objet type Wave_read
+    assert(type(nom)==str),"chaine de charactere attendue pour nom"
+    
+    if(nom[-4:]!=".wav"):
+        nom+=".wav"
+    
+    with wave.open(nom,'r') as fichier: #creation de l'objet type Wave_read
      #on recupere les donnees brut au format byte_elt (pas l'en-tete) :
         data_byte=fichier.readframes(fichier.getnframes())
         data_length = len(data_byte) #nb d'octets de donnees
@@ -39,12 +45,11 @@ def ouvrir(nom):
             print("Conversion de stereo vers mono effectuee")
         fech = fichier.getframerate()
         objet = DonneeSon(data,nbOctet,fech)
-    print("Donnees de {}.wav recuperes.\nCaracteristiques : duree = {}s, \
+    print("Donnees de {} recuperes.\nCaracteristiques : duree = {}s, \
 fech = {}, nbOctet = {} ".format(nom,round(len(data)/fech,2),\
           fech,nbOctet))
     return objet
     
-
 
 class DonneeSon:
     """
@@ -64,10 +69,12 @@ class DonneeSon:
         correspondant a l’objet.
         """
         assert (type(nom) == str),"nom doit etre une chaine de charactere"
-        assert (not(os.path.exists(nom+".wav"))), \
-        "le fichier " +nom +".wav existe déjà"
+        if(nom[-4:]!=".wav"):
+            nom+=".wav"
+        assert (not(os.path.exists(nom))), \
+        "le fichier " +nom +" existe déjà"
         
-        fichier = wave.open(nom + ".wav",'w') #creation de l'objet type Wave_write
+        fichier = wave.open(nom,'w') #creation de l'objet type Wave_write
         nbEch = len(self.data)
         fichier.setparams((1, self.nbOctet, self.fech, nbEch, "NONE", \
                            "not compressed" ))
@@ -87,8 +94,17 @@ class DonneeSon:
                 
         #la duree est egale au nombre d'échantillon divise par fech.
         duree = nbEch/(self.fech)
-        print("le fichier {}.wav de duree {}s a ete cree".format\
+        print("le fichier {} de duree {}s a ete cree".format\
               (nom,round(duree,2)))
+        
+    def copie(self):
+        """
+        Retourne une copie de l'objet DonneeSon.
+        Utile pour conserver des versions de l'objet avant les traitements.
+        """
+        dataCp = [elt for elt in self.data]
+        return(DonneeSon(dataCp,self.nbOctet,self.fech))
+        
     
     def ssEch(self,info=1,N=2):
         """
@@ -99,7 +115,10 @@ class DonneeSon:
         choix. Sinon, prend en compte le paramètre N entre lors de l'appel.
         """
         if(info==1):
-            print("N peut prendre une valeure dans la liste suivante:")
+            print("La frequence d'echantillonage actuelle est de {} Hz."\
+                  .format(self.fech))
+            print("\nLe facteur de reduction N peut prendre une valeur \
+dans la liste suivante:")
             liste = diviseurs(self.fech)
             print("{}".format(liste))
             N=int(input("Votre choix pour N (1 pour annuler):"))
@@ -224,11 +243,11 @@ class DonneeSon:
         f = np.linspace(0,len(Y)/duree,len(Y))
         return [f,np.abs(Y)/norm]
     
-    def graphFFT(self,nom="",tmin=0,tmax=0.02,fmin=0,fmax="fech//2"):
+    def graphFFT(self,nom="courbeFFT",tmin=0,tmax=0.02,fmin=0,fmax="fech//2"):
         """
-        Permet de visualiser le module de la transformee de fourier en regard de
-        la forme d'onde.
-        La plage des ordonnees s'adapte aux valeurs max de la courbe.
+        Permet de visualiser le module de la transformee de fourier normalise
+        en regard de la forme d'onde.
+        La plage des ordonnees affichees s'adapte aux valeurs max de la courbe.
         - nom une string qui sera le nom de la courbe ajoutee
                 (utile si visualisation parallèle de plusieurs courbes)
         - tmin et tmax en s
@@ -313,6 +332,118 @@ class DonneeSon:
                 A[len(A)-i]=0j
         a=np.fft.irfft(A)
         self.data = [int(a[i]) for i in range(len(a))]
+    
+    def filtreBas(self,coupure, ordre = 200):
+        """
+        Réalise un filtrage numérique passe bas RIF à l'aide d'une
+        fenêtre de Hamming.
+        
+        coupure : la frequence de coupure en Hz
+        ordre : l'ordre du filtre
+        """
+        assert(type(coupure)==float or type(coupure)==int),\
+        "Flottant en HZ attendu pour l'argument coupure"
+        assert(type(ordre)==int),\
+        "ordre doit etre un entier representant l'ordre desire du filtre"
+        
+        coupure = 2*coupure/self.fech #par convention frequence de nyquyst = 1
+        filtre = sig.firwin(ordre,coupure)
+        res = sig.convolve(self.data,filtre,mode="same")
+        self.data = [int(res[i]) for i in range(len(res))]
+    
+    def visufiltreBas(self, coupure, ordre=200):
+        """
+        Pour observer la reponse frequentielle du filtreBas applique
+        avec les memes parametres
+        """
+        coupure = 2*coupure/self.fech #par convention frequence de nyquyst = 1
+        filtre = sig.firwin(ordre,coupure)
+        visuFiltre(filtre,self.fech)
+        
+        
+    def filtreHaut(self, coupure, ordre = 200):
+        """
+        Réalise un filtrage numérique passe haut RIF à l'aide d'une
+        fenêtre de Hamming.
+        
+        coupure : la frequence de coupure en Hz
+        ordre : l'ordre du filtre
+        """
+        assert(type(coupure)==float or type(coupure)==int),\
+        "Flottant en HZ attendu pour l'argument coupure"
+        assert(type(ordre)==int),\
+        "ordre doit etre un entier representant l'ordre desire du filtre"
+        if(ordre%2==0):
+            ordre += 1 #on évite une contrainte dans lec as de l'odre pair
+        coupure = 2*coupure/self.fech #par convention frequence de nyquyst = 1
+        filtre = sig.firwin(ordre,coupure,pass_zero=False)
+        res = sig.convolve(self.data,filtre,mode="same")
+        self.data = [int(res[i]) for i in range(len(res))]
+        
+    def visufiltreHaut(self, coupure, ordre=200):
+        """
+        Pour observer la reponse frequentielle du filtreHaut applique
+        avec les memes parametres
+        """
+        if(ordre%2==0):
+            ordre += 1 #on évite une contrainte dans le cas de l'odre pair
+        coupure = 2*coupure/self.fech #par convention frequence de nyquyst = 1
+        filtre = sig.firwin(ordre,coupure,pass_zero=True)
+        visuFiltre(filtre,self.fech)
+        
+    def filtreBande(self, coupure, passe_bande=True, ordre = 200):
+        """
+        Réalise un filtrage numérique RIF à l'aide d'une
+        fenêtre de Hamming. Si passe_bande == True on effectue un filtrage
+        passe_bande, s'il vaut False on effectue un filtrage coupe bande.
+        
+        
+        coupure : tableau des deux frequence de coupure en Hz
+        passe_bande : Booleen pour choisir passe ou coupe bande
+        ordre : l'ordre du filtre
+        """
+        assert(len(coupure)==2),\
+        "Tableau de 2 frequence en herz [f0, f1] attendu pour l'argument coupure"
+        assert(type(passe_bande)==bool), \
+        "Booleen attendu pour l'argument passe_bande"
+        assert(type(ordre)==int),\
+        "ordre doit etre un entier representant l'ordre desire du filtre"
+        
+        if(ordre%2==0 and not(passe_bande)):
+            ordre += 1 #on évite une contrainte dans le cas de l'odre pair
+        coupure[0] = 2*coupure[0]/self.fech #par convention frequence de nyquyst = 1
+        coupure[1] = 2*coupure[1]/self.fech
+        filtre = sig.firwin(ordre,coupure,pass_zero=not(passe_bande))
+        res = sig.convolve(self.data,filtre,mode="same")
+        self.data = [int(res[i]) for i in range(len(res))]
+
+    def visufiltreBande(self, coupure, passe_bande = True, ordre=200):
+        """
+        Pour observer la reponse frequentielle du filtreHaut applique
+        avec les memes parametres
+        """
+        if(ordre%2==0):
+            ordre += 1 #on évite une contrainte dans le cas de l'odre pair
+        coupure[0] = 2*coupure[0]/self.fech #par convention frequence de nyquyst = 1
+        coupure[1] = 2*coupure[1]/self.fech
+        filtre = sig.firwin(ordre,coupure,pass_zero=not(passe_bande))
+        visuFiltre(filtre,self.fech)
+
+#__________________________Partie_Spectrogramme________________________________
+
+    def spectro(self,nom="spectrogramme"):
+        
+        plt.figure()
+        plt.title(nom)
+        if(self.nbOctet!=2):  #Pour eviter la composante continue parasite
+            donnee = [(elt-128) for elt in self.data]
+        else:
+            donnee = self.data
+        plt.specgram(donnee,Fs=self.fech)
+        plt.xlabel("temps(s)")
+        plt.ylabel("frequence(Hz)")
+        plt.grid()
+        plt.show()
 
 #__________________________Partie_Effets_Sonor_________________________________
 
@@ -393,6 +524,8 @@ def raffraichirProgres(progres):
     sys.stdout.write(text)
     sys.stdout.flush()
     
+    
+    
 def diviseurs(n):
     """
     Renvoie la liste des 10 premiers diviseurs de l'argument n, entier positif
@@ -408,3 +541,23 @@ def diviseurs(n):
             div.append(i)
 
     return div
+
+def visuFiltre(filtre, fech):
+    """
+    Utilise pour les fonctions de visualisation de visufiltreHaut, visufiltreBas 
+    et visufiltreBande
+    """
+    
+    w,h=sig.freqz(filtre)
+    plt.figure()
+    plt.subplot(211)
+    plt.plot(fech*w/(np.pi*2),20*np.log10(np.absolute(h)))
+    plt.xlabel("f(Hz)")
+    plt.ylabel("Gain(dB)")
+    plt.grid()
+    plt.subplot(212)
+    plt.plot(fech*w/(2*np.pi),np.unwrap(np.angle(h)))
+    plt.xlabel("f(Hz)")
+    plt.ylabel("phase(rad)")
+    plt.grid()
+    plt.show()
