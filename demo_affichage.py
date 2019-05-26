@@ -87,14 +87,14 @@ def open_data(e1):
    add_some_action(var)
 
 def open_son():
+   
    open = Toplevel(root)
-   open.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("wav files","*.wav"),("all files","*.*")))
+   #open.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("wav files","*.wav"),("all files","*.*")))
+   open.filename =  filedialog.askopenfilename(initialdir = "/Cassiopee_Music",title = "Select file",filetypes = (("wav files","*.wav"),("all files","*.*")))
    print (open.filename)
    open_data(open.filename)
    
-   #Button(openson, text='Quitter', command=openson.quit).grid(row=3, column=0, sticky=W, pady=4)
-   #Button(openson, text='Ouvrir le fichier', command= open_data(e1.get()) ).grid(row=3, column=1, sticky=W, pady=4)
-   
+
 root = tk.Tk()
 
 ecran_accueil = Canvas(root, width=500, height=500, bg = "white")
