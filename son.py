@@ -388,7 +388,7 @@ dans la liste suivante:")
         if(ordre%2==0):
             ordre += 1 #on évite une contrainte dans le cas de l'odre pair
         coupure = 2*coupure/self.fech #par convention frequence de nyquyst = 1
-        filtre = sig.firwin(ordre,coupure,pass_zero=True)
+        filtre = sig.firwin(ordre,coupure,pass_zero=False)
         visuFiltre(filtre,self.fech)
         
     def filtreBande(self, coupure, passe_bande=True, ordre = 200):
