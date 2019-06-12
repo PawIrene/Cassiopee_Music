@@ -65,7 +65,7 @@ def create_note_shepard():
    createshepard = Toplevel(root)
    TEXTE = "Le nombre d'octet est fixé à 2. La durée est fixée à 3 secondes et le volume est à 0.5."
    Label(createshepard, text = TEXTE).grid(row=0)
-   Label(createsheapard, text="Fréquence fondamentale de la note (Hz) : ").grid(row=1)
+   Label(createshepard, text="Fréquence fondamentale de la note (Hz) : ").grid(row=1)
    e1 = Entry(createshepard)
    e1.grid(row=1, column=1)  
    Button(createshepard, text='Créer la note de Shepard', command= lambda : create_son_shepard(e1.get())).grid(row=3, column=1, sticky=W, pady=4)
@@ -87,14 +87,11 @@ def open_data(e1):
    add_some_action(var)
 
 def open_son():
-   
    open = Toplevel(root)
-   #open.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("wav files","*.wav"),("all files","*.*")))
    open.filename =  filedialog.askopenfilename(initialdir = "/Cassiopee_Music",title = "Select file",filetypes = (("wav files","*.wav"),("all files","*.*")))
    print (open.filename)
    open_data(open.filename)
    
-
 root = tk.Tk()
 
 ecran_accueil = Canvas(root, width=500, height=500, bg = "white")
