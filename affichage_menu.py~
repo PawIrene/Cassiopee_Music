@@ -1,6 +1,0 @@
-import tkinter as tk
-#importe la bibliothèque tkinter permettant d'ouvrir des fenêtres
-from tkinter import *
-from PIL import Image
-from PIL import ImageTk
-from tkinter import messagebox
